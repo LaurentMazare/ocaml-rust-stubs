@@ -41,6 +41,10 @@ pub fn col_names(reader: ReaderPtr) -> Vec<String> {
         .collect()
 }
 
+pub fn num_rows(reader: ReaderPtr) -> isize {
+    reader.as_ref().num_rows as isize
+}
+
 pub fn read_int_col(mut reader: ReaderPtr, idx: isize) -> Result<Vec<isize>, ocaml::Error> {
     let num_rows = reader.as_ref().num_rows as usize;
     let mut record_batch_reader = reader

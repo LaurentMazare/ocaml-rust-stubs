@@ -31,6 +31,15 @@ let col_names =
       ~result_type:Type.(array string)
       ~can_raise:false)
 
+let num_rows =
+  Stubs_fn.(
+    create
+      ~ml_name:"num_rows"
+      ~rust_name:"super::helpers::num_rows"
+      ~arg_types:[ reader ]
+      ~result_type:Type.int
+      ~can_raise:false)
+
 let read_int_col =
   Stubs_fn.(
     create
@@ -66,6 +75,7 @@ let stubs =
       ; read_int_col
       ; read_float_col
       ; read_string_col
+      ; num_rows
       ]
   ; prefix = "mlparquet_"
   }

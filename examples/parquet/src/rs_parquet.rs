@@ -40,3 +40,9 @@ pub fn mlparquet__ml_rs6(v1: ocaml::Value, v2: ocaml::Value) -> ocaml::Value {
     let res: Result<Vec<String>, ocaml::Error> = super::helpers::read_string_col(v1, v2);
     res.to_value()
 }
+#[ocaml::native_func]
+pub fn mlparquet__ml_rs7(v1: ocaml::Value) -> ocaml::Value {
+    let v1: ocaml::Pointer<super::helpers::Reader> =  ocaml::FromValue::from_value(v1);
+    let res: isize = super::helpers::num_rows(v1);
+    res.to_value()
+}
