@@ -1,0 +1,4 @@
+(library
+  (name rust_stubs)
+  (public_name rust-stubs)
+  (libraries base stdio))

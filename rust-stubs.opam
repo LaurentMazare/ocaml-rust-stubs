@@ -1,0 +1,35 @@
+opam-version: "2.0"
+name:         "rust-stubs"
+bug-reports:  "https://github.com/LaurentMazare/ocaml-rust-stubs/issues"
+homepage:     "https://github.com/LaurentMazare/ocaml-rust-stubs"
+dev-repo:     "git+https://github.com/LaurentMazare/ocaml-rust-stubs.git"
+maintainer:   "Laurent Mazare <lmazare@gmail.com>"
+authors:      [ "Laurent Mazare" ]
+
+version: "dev"
+
+build: [["dune" "build" "-p" name "-j" jobs]]
+install: []
+remove:  []
+
+run-test: [
+  ["dune" "runtest" "-p" name "-j" jobs]
+]
+
+depends: [
+  "dune" {>= "2.5.0"}
+  "ocaml" {>= "4.06"}
+  "base"
+  "stdio"
+]
+
+depopts: [
+]
+
+conflicts: [
+]
+
+synopsis: "Stubs generation for rust bindings"
+description: """
+Automated stubs generation for rust bindings.
+"""

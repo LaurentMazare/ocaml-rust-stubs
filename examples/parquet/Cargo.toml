@@ -1,0 +1,15 @@
+[package]
+name = "parquet-ocaml"
+version = "0.1.0"
+authors = ["laurent <laurent.mazare@gmail.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["staticlib", "cdylib"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+arrow = "0.16.0"
+parquet = "0.16.0"
+ocaml = "0.13.4"

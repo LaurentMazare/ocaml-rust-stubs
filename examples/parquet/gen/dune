@@ -1,0 +1,3 @@
+(executables
+  (names gen)
+  (libraries base stdio rust_stubs))

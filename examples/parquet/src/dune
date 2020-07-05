@@ -1,0 +1,16 @@
+(rule
+ (targets libparquet_ocaml.a libparquet_ocaml.so)
+ (deps (glob_files *.rs) ../Cargo.toml)
+ (action
+  (progn
+   (run rm -f %{project_root}/examples/parquet/target/debug/deps/libparquet_ocaml.a)
+   (run rm -f %{project_root}/examples/parquet/target/debug/deps/libparquet_ocaml.so)
+   (run cargo +nightly build --target-dir %{project_root}/examples/parquet/target)
+   (run mv %{project_root}/examples/parquet/target/debug/libparquet_ocaml.so ./libparquet_ocaml.so)
+   (run mv %{project_root}/examples/parquet/target/debug/libparquet_ocaml.a libparquet_ocaml.a))))
+
+(library
+ (name parquet_rs)
+ (libraries base stdio)
+ (foreign_archives parquet_ocaml)
+ (c_library_flags (-lc -lm)))

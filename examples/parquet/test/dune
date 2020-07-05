@@ -1,0 +1,4 @@
+(executables
+ (libraries base parquet_rs stdio)
+ (names test)
+ (modules test))
