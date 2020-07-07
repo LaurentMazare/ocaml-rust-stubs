@@ -22,13 +22,13 @@ let reader_close =
       ~result_type:Type.unit
       ~can_raise:false)
 
-let col_names =
+let fields =
   Stubs_fn.(
     create
-      ~ml_name:"col_names"
-      ~rust_name:"super::helpers::col_names"
+      ~ml_name:"fields"
+      ~rust_name:"super::helpers::fields"
       ~arg_types:[ reader ]
-      ~result_type:Type.(array string)
+      ~result_type:Type.(array (tuple2 string int))
       ~can_raise:false)
 
 let num_rows =
@@ -71,7 +71,7 @@ let stubs =
   { Stubs_gen.fns =
       [ parquet_reader
       ; reader_close
-      ; col_names
+      ; fields
       ; read_int_col
       ; read_float_col
       ; read_string_col

@@ -31,13 +31,31 @@ pub fn reader_close(reader: ReaderPtr) {
     unsafe { reader.drop_in_place() }
 }
 
-pub fn col_names(reader: ReaderPtr) -> Vec<String> {
+pub fn datatype_to_int(datatype: &arrow::datatypes::DataType) -> isize {
+    match datatype {
+        arrow::datatypes::DataType::Boolean => 0,
+        arrow::datatypes::DataType::Int8 => 1,
+        arrow::datatypes::DataType::Int16 => 2,
+        arrow::datatypes::DataType::Int32 => 3,
+        arrow::datatypes::DataType::Int64 => 4,
+        arrow::datatypes::DataType::UInt8 => 5,
+        arrow::datatypes::DataType::UInt16 => 6,
+        arrow::datatypes::DataType::UInt32 => 7,
+        arrow::datatypes::DataType::UInt64 => 8,
+        arrow::datatypes::DataType::Float16 => 9,
+        arrow::datatypes::DataType::Float32 => 10,
+        arrow::datatypes::DataType::Float64 => 11,
+        _ => -1,
+    }
+}
+
+pub fn fields(reader: ReaderPtr) -> Vec<(String, isize)> {
     reader
         .as_ref()
         .schema
         .fields()
         .into_iter()
-        .map(|x| x.name().to_owned())
+        .map(|x| (x.name().to_owned(), datatype_to_int(x.data_type())))
         .collect()
 }
 

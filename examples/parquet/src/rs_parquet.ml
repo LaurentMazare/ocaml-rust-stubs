@@ -3,7 +3,7 @@
 type reader
 external parquet_reader : string -> reader = "mlparquet__ml_rs1"
 external reader_close : reader -> unit = "mlparquet__ml_rs2"
-external col_names : reader -> (string) array = "mlparquet__ml_rs3"
+external fields : reader -> ((string * int)) array = "mlparquet__ml_rs3"
 external read_int_col : reader -> int -> (int) array = "mlparquet__ml_rs4"
 external read_float_col : reader -> int -> (float) array = "mlparquet__ml_rs5"
 external read_string_col : reader -> int -> (string) array = "mlparquet__ml_rs6"
