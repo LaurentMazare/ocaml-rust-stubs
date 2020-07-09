@@ -13,6 +13,7 @@ type data_type =
   | Float16
   | Float32
   | Float64
+  | Unknown of int
 
 let data_type_of_int = function
   | 0 -> Boolean
@@ -27,7 +28,7 @@ let data_type_of_int = function
   | 9 -> Float16
   | 10 -> Float32
   | 11 -> Float64
-  | _ -> failwith "unexpected data-type int repr"
+  | d -> Unknown d
 
 let string_of_data_type = function
   | Boolean -> "Boolean"
@@ -42,3 +43,4 @@ let string_of_data_type = function
   | Float16 -> "Float16"
   | Float32 -> "Float32"
   | Float64 -> "Float64"
+  | Unknown d -> Printf.sprintf "Unknown<%d>" d
