@@ -30,18 +30,25 @@ pub fn mlparquet__ml_rs4(v1: ocaml::Value, v2: ocaml::Value) -> ocaml::Value {
 pub fn mlparquet__ml_rs5(v1: ocaml::Value, v2: ocaml::Value) -> ocaml::Value {
     let v1: ocaml::Pointer<super::helpers::Reader> =  ocaml::FromValue::from_value(v1);
     let v2: isize =  ocaml::FromValue::from_value(v2);
-    let res: Result<Vec<f64>, ocaml::Error> = super::helpers::read_float_col(v1, v2);
+    let res: Result<ocaml::bigarray::Array1<i64>, ocaml::Error> = super::helpers::read_int_col_ba(v1, v2);
     res.to_value()
 }
 #[ocaml::native_func]
 pub fn mlparquet__ml_rs6(v1: ocaml::Value, v2: ocaml::Value) -> ocaml::Value {
     let v1: ocaml::Pointer<super::helpers::Reader> =  ocaml::FromValue::from_value(v1);
     let v2: isize =  ocaml::FromValue::from_value(v2);
+    let res: Result<Vec<f64>, ocaml::Error> = super::helpers::read_float_col(v1, v2);
+    res.to_value()
+}
+#[ocaml::native_func]
+pub fn mlparquet__ml_rs7(v1: ocaml::Value, v2: ocaml::Value) -> ocaml::Value {
+    let v1: ocaml::Pointer<super::helpers::Reader> =  ocaml::FromValue::from_value(v1);
+    let v2: isize =  ocaml::FromValue::from_value(v2);
     let res: Result<Vec<String>, ocaml::Error> = super::helpers::read_string_col(v1, v2);
     res.to_value()
 }
 #[ocaml::native_func]
-pub fn mlparquet__ml_rs7(v1: ocaml::Value) -> ocaml::Value {
+pub fn mlparquet__ml_rs8(v1: ocaml::Value) -> ocaml::Value {
     let v1: ocaml::Pointer<super::helpers::Reader> =  ocaml::FromValue::from_value(v1);
     let res: isize = super::helpers::num_rows(v1);
     res.to_value()

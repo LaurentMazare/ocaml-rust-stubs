@@ -49,6 +49,15 @@ let read_int_col =
       ~result_type:Type.(array int)
       ~can_raise:true)
 
+let read_int_col_ba =
+  Stubs_fn.(
+    create
+      ~ml_name:"read_int_col_ba"
+      ~rust_name:"super::helpers::read_int_col_ba"
+      ~arg_types:[ reader; Type.int ]
+      ~result_type:Type.(bigarray `i64)
+      ~can_raise:true)
+
 let read_float_col =
   Stubs_fn.(
     create
@@ -73,6 +82,7 @@ let stubs =
       ; reader_close
       ; fields
       ; read_int_col
+      ; read_int_col_ba
       ; read_float_col
       ; read_string_col
       ; num_rows

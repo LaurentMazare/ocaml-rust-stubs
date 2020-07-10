@@ -14,6 +14,7 @@ module Type = struct
     | Array of t
     | Tuple2 of t * t
     | Tuple3 of t * t * t
+    | Bigarray of [ `i64 ]
 
   let int = Int
   let float = Float
@@ -24,6 +25,7 @@ module Type = struct
   let array t = Array t
   let tuple2 t1 t2 = Tuple2 (t1, t2)
   let tuple3 t1 t2 t3 = Tuple3 (t1, t2, t3)
+  let bigarray kind = Bigarray kind
 
   let ml_type =
     let rec loop = function
@@ -37,6 +39,7 @@ module Type = struct
       | Tuple2 (t1, t2) -> Printf.sprintf "(%s * %s)" (loop t1) (loop t2)
       | Tuple3 (t1, t2, t3) ->
         Printf.sprintf "(%s * %s * %s)" (loop t1) (loop t2) (loop t3)
+      | Bigarray `i64 -> "(int, Bigarray.int64_elt, Bigarray.c_layout) Bigarray.Array1.t"
     in
     loop
 
@@ -55,6 +58,7 @@ module Type = struct
       | Array t -> Printf.sprintf "Vec<%s>" (loop t)
       | Tuple2 (t1, t2) -> Printf.sprintf "(%s, %s)" (loop t1) (loop t2)
       | Tuple3 (t1, t2, t3) -> Printf.sprintf "(%s, %s, %s)" (loop t1) (loop t2) (loop t3)
+      | Bigarray `i64 -> "ocaml::bigarray::Array1<i64>"
     in
     loop t
 end
@@ -90,7 +94,7 @@ let arg_count t = List.length t.arg_types
 let abstract_ml_types t =
   let ml_types = Hash_set.create (module String) in
   let rec loop = function
-    | Type.Int | Float | Unit | String -> ()
+    | Type.Int | Float | Unit | String | Bigarray `i64 -> ()
     | Abstract_pointer { ml_name; rust_name = _ } -> Hash_set.add ml_types ml_name
     | List t | Array t -> loop t
     | Tuple2 (t1, t2) ->

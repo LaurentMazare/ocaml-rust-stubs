@@ -134,3 +134,31 @@ pub fn read_string_col(mut reader: ReaderPtr, idx: isize) -> Result<Vec<String>,
     }
     Ok(vec)
 }
+
+pub fn read_int_col_ba(
+    mut r: ReaderPtr,
+    idx: isize,
+) -> Result<ocaml::bigarray::Array1<i64>, ocaml::Error> {
+    let num_rows = r.as_ref().num_rows as usize;
+    let mut r = r
+        .as_mut()
+        .reader
+        .get_record_reader(std::cmp::min(num_rows, 512))?;
+    let mut ba = ocaml::bigarray::Array1::<i64>::create(num_rows);
+    let mut ba_data = ba.data_mut();
+    let mut offset = 0usize;
+    while let Some(batch) = r.next_batch()? {
+        let array_data = batch.column(idx as usize);
+        let array_data = match (*array_data).as_any().downcast_ref::<Int64Array>() {
+            Some(array_data) => array_data,
+            None => {
+                let msg = format!("cannot downcast {:?} to Int64", array_data.data_type());
+                return Err(ocaml::Error::Error(msg.into()));
+            }
+        };
+        let len = array_data.len();
+        ba_data[offset..offset + len].copy_from_slice(array_data.value_slice(0, len));
+        offset += len;
+    }
+    Ok(ba)
+}
