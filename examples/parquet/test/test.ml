@@ -18,7 +18,7 @@ let () =
         |> Array.iteri ~f:(fun index v -> Stdio.printf "> %d %d\n%!" index v);
         let ba = Parquet_rs.read_int_col_ba reader idx in
         for i = 0 to Bigarray.Array1.dim ba - 1 do
-          Stdio.printf ">> %d %d\n%!" i ba.{i}
+          Stdio.printf ">> %d %d\n%!" i (Int64.to_int_exn ba.{i})
         done
       | Float64 ->
         Parquet_rs.read_float_col reader idx

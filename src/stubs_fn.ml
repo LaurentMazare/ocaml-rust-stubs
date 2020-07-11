@@ -39,7 +39,8 @@ module Type = struct
       | Tuple2 (t1, t2) -> Printf.sprintf "(%s * %s)" (loop t1) (loop t2)
       | Tuple3 (t1, t2, t3) ->
         Printf.sprintf "(%s * %s * %s)" (loop t1) (loop t2) (loop t3)
-      | Bigarray `i64 -> "(int, Bigarray.int64_elt, Bigarray.c_layout) Bigarray.Array1.t"
+      | Bigarray `i64 ->
+        "(int64, Bigarray.int64_elt, Bigarray.c_layout) Bigarray.Array1.t"
     in
     loop
 
