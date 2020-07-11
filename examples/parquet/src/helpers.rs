@@ -63,51 +63,63 @@ pub fn num_rows(reader: ReaderPtr) -> isize {
     reader.as_ref().num_rows as isize
 }
 
-pub fn read_int_col(mut reader: ReaderPtr, idx: isize) -> Result<Vec<isize>, ocaml::Error> {
-    let num_rows = reader.as_ref().num_rows as usize;
-    let mut record_batch_reader = reader
-        .as_mut()
-        .reader
-        .get_record_reader(std::cmp::min(num_rows, 512))?;
-    let mut vec = Vec::with_capacity(num_rows);
-    while let Some(batch) = record_batch_reader.next_batch()? {
-        let array_data = batch.column(idx as usize);
-        let array_data = match (*array_data).as_any().downcast_ref::<Int64Array>() {
-            Some(array_data) => array_data,
-            None => {
-                let msg = format!("cannot downcast {:?} to Int64", array_data.data_type());
-                return Err(ocaml::Error::Error(msg.into()));
+macro_rules! read_col {
+    ($t:ty, $a:ident, $fn:ident, $fn_ba:ident) => {
+        pub fn $fn(mut reader: ReaderPtr, idx: isize) -> Result<Vec<$t>, ocaml::Error> {
+            let num_rows = reader.as_ref().num_rows as usize;
+            let mut record_batch_reader = reader
+                .as_mut()
+                .reader
+                .get_record_reader(std::cmp::min(num_rows, 4096))?;
+            let mut vec = Vec::with_capacity(num_rows);
+            while let Some(batch) = record_batch_reader.next_batch()? {
+                let array_data = batch.column(idx as usize);
+                let array_data = match (*array_data).as_any().downcast_ref::<$a>() {
+                    Some(array_data) => array_data,
+                    None => {
+                        let msg = format!("cannot downcast {:?} to $a", array_data.data_type());
+                        return Err(ocaml::Error::Error(msg.into()));
+                    }
+                };
+                for i in 0..array_data.len() {
+                    vec.push(array_data.value(i) as $t)
+                }
             }
-        };
-        for i in 0..array_data.len() {
-            vec.push(array_data.value(i) as isize)
+            Ok(vec)
         }
-    }
-    Ok(vec)
+
+        pub fn $fn_ba(
+            mut r: ReaderPtr,
+            idx: isize,
+        ) -> Result<ocaml::bigarray::Array1<$t>, ocaml::Error> {
+            let num_rows = r.as_ref().num_rows as usize;
+            let mut r = r
+                .as_mut()
+                .reader
+                .get_record_reader(std::cmp::min(num_rows, 4096))?;
+            let mut ba = ocaml::bigarray::Array1::<$t>::create(num_rows);
+            let mut ba_data = ba.data_mut();
+            let mut offset = 0usize;
+            while let Some(batch) = r.next_batch()? {
+                let array_data = batch.column(idx as usize);
+                let array_data = match (*array_data).as_any().downcast_ref::<$a>() {
+                    Some(array_data) => array_data,
+                    None => {
+                        let msg = format!("cannot downcast {:?} to $a", array_data.data_type());
+                        return Err(ocaml::Error::Error(msg.into()));
+                    }
+                };
+                let len = array_data.len();
+                ba_data[offset..offset + len].copy_from_slice(array_data.value_slice(0, len));
+                offset += len;
+            }
+            Ok(ba)
+        }
+    };
 }
 
-pub fn read_float_col(mut reader: ReaderPtr, idx: isize) -> Result<Vec<f64>, ocaml::Error> {
-    let num_rows = reader.as_ref().num_rows as usize;
-    let mut record_batch_reader = reader
-        .as_mut()
-        .reader
-        .get_record_reader(std::cmp::min(num_rows, 512))?;
-    let mut vec = Vec::with_capacity(num_rows);
-    while let Some(batch) = record_batch_reader.next_batch()? {
-        let array_data = batch.column(idx as usize);
-        let array_data = match (*array_data).as_any().downcast_ref::<Float64Array>() {
-            Some(array_data) => array_data,
-            None => {
-                let msg = format!("cannot downcast {:?} to Float64", array_data.data_type());
-                return Err(ocaml::Error::Error(msg.into()));
-            }
-        };
-        for i in 0..array_data.len() {
-            vec.push(array_data.value(i))
-        }
-    }
-    Ok(vec)
-}
+read_col!(i64, Int64Array, read_i64_col, read_i64_col_ba);
+read_col!(f64, Float64Array, read_f64_col, read_f64_col_ba);
 
 pub fn read_string_col(mut reader: ReaderPtr, idx: isize) -> Result<Vec<String>, ocaml::Error> {
     let num_rows = reader.as_ref().num_rows as usize;
@@ -133,32 +145,4 @@ pub fn read_string_col(mut reader: ReaderPtr, idx: isize) -> Result<Vec<String>,
         }
     }
     Ok(vec)
-}
-
-pub fn read_int_col_ba(
-    mut r: ReaderPtr,
-    idx: isize,
-) -> Result<ocaml::bigarray::Array1<i64>, ocaml::Error> {
-    let num_rows = r.as_ref().num_rows as usize;
-    let mut r = r
-        .as_mut()
-        .reader
-        .get_record_reader(std::cmp::min(num_rows, 512))?;
-    let mut ba = ocaml::bigarray::Array1::<i64>::create(num_rows);
-    let mut ba_data = ba.data_mut();
-    let mut offset = 0usize;
-    while let Some(batch) = r.next_batch()? {
-        let array_data = batch.column(idx as usize);
-        let array_data = match (*array_data).as_any().downcast_ref::<Int64Array>() {
-            Some(array_data) => array_data,
-            None => {
-                let msg = format!("cannot downcast {:?} to Int64", array_data.data_type());
-                return Err(ocaml::Error::Error(msg.into()));
-            }
-        };
-        let len = array_data.len();
-        ba_data[offset..offset + len].copy_from_slice(array_data.value_slice(0, len));
-        offset += len;
-    }
-    Ok(ba)
 }

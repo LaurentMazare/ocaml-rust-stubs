@@ -4,6 +4,7 @@ module Type : sig
   type t
 
   val int : t
+  val int64 : t
   val float : t
   val unit : t
   val string : t
@@ -12,7 +13,7 @@ module Type : sig
   val array : t -> t
   val tuple2 : t -> t -> t
   val tuple3 : t -> t -> t -> t
-  val bigarray : [ `i64 ] -> t
+  val bigarray : [ `i64 | `f64 ] -> t
   val ml_type : t -> string
   val rust_type : t -> str:[ `slice | `string ] -> string
 end

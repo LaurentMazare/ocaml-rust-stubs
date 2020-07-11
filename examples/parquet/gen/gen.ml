@@ -40,29 +40,38 @@ let num_rows =
       ~result_type:Type.int
       ~can_raise:false)
 
-let read_int_col =
+let read_i64_col =
   Stubs_fn.(
     create
-      ~ml_name:"read_int_col"
-      ~rust_name:"super::helpers::read_int_col"
+      ~ml_name:"read_i64_col"
+      ~rust_name:"super::helpers::read_i64_col"
       ~arg_types:[ reader; Type.int ]
-      ~result_type:Type.(array int)
+      ~result_type:Type.(array int64)
       ~can_raise:true)
 
-let read_int_col_ba =
+let read_i64_col_ba =
   Stubs_fn.(
     create
-      ~ml_name:"read_int_col_ba"
-      ~rust_name:"super::helpers::read_int_col_ba"
+      ~ml_name:"read_i64_col_ba"
+      ~rust_name:"super::helpers::read_i64_col_ba"
       ~arg_types:[ reader; Type.int ]
       ~result_type:Type.(bigarray `i64)
       ~can_raise:true)
 
-let read_float_col =
+let read_f64_col_ba =
   Stubs_fn.(
     create
-      ~ml_name:"read_float_col"
-      ~rust_name:"super::helpers::read_float_col"
+      ~ml_name:"read_f64_col_ba"
+      ~rust_name:"super::helpers::read_f64_col_ba"
+      ~arg_types:[ reader; Type.int ]
+      ~result_type:Type.(bigarray `f64)
+      ~can_raise:true)
+
+let read_f64_col =
+  Stubs_fn.(
+    create
+      ~ml_name:"read_f64_col"
+      ~rust_name:"super::helpers::read_f64_col"
       ~arg_types:[ reader; Type.int ]
       ~result_type:Type.(array float)
       ~can_raise:true)
@@ -81,9 +90,10 @@ let stubs =
       [ parquet_reader
       ; reader_close
       ; fields
-      ; read_int_col
-      ; read_int_col_ba
-      ; read_float_col
+      ; read_i64_col
+      ; read_i64_col_ba
+      ; read_f64_col_ba
+      ; read_f64_col
       ; read_string_col
       ; num_rows
       ]

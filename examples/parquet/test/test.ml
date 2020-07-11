@@ -14,14 +14,15 @@ let () =
       Stdio.printf "col %d %s %s\n%!" idx name (Parquet_rs.string_of_data_type dt);
       match dt with
       | Int64 ->
-        Parquet_rs.read_int_col reader idx
-        |> Array.iteri ~f:(fun index v -> Stdio.printf "> %d %d\n%!" index v);
-        let ba = Parquet_rs.read_int_col_ba reader idx in
+        Parquet_rs.read_i64_col reader idx
+        |> Array.iteri ~f:(fun index v ->
+               Stdio.printf "> %d %d\n%!" index (Int64.to_int_exn v));
+        let ba = Parquet_rs.read_i64_col_ba reader idx in
         for i = 0 to Bigarray.Array1.dim ba - 1 do
           Stdio.printf ">> %d %d\n%!" i (Int64.to_int_exn ba.{i})
         done
       | Float64 ->
-        Parquet_rs.read_float_col reader idx
+        Parquet_rs.read_f64_col reader idx
         |> Array.iteri ~f:(fun index v -> Stdio.printf "> %d %f\n%!" index v)
       | _ -> ());
   Parquet_rs.reader_close reader
