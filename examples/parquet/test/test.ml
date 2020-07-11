@@ -1,7 +1,10 @@
 open! Base
+module Sys = Caml.Sys
 
 let () =
-  let reader = Parquet_rs.parquet_reader "/tmp/b.parquet" in
+  if Array.length Sys.argv <> 2
+  then Printf.sprintf "usage: %s file.parquet" Sys.argv.(0) |> failwith;
+  let reader = Parquet_rs.parquet_reader Sys.argv.(1) in
   let fields =
     Parquet_rs.fields reader
     |> Array.map ~f:(fun (name, dt) -> name, Parquet_rs.data_type_of_int dt)

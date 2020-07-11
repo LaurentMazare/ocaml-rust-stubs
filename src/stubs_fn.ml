@@ -15,7 +15,7 @@ module Type = struct
     | Array of t
     | Tuple2 of t * t
     | Tuple3 of t * t * t
-    | Bigarray of [ `i64 | `f64 ]
+    | Bigarray of [ `i64 | `f64 | `i32 | `f32 ]
 
   let int = Int
   let int64 = Int64
@@ -46,6 +46,10 @@ module Type = struct
         "(int64, Bigarray.int64_elt, Bigarray.c_layout) Bigarray.Array1.t"
       | Bigarray `f64 ->
         "(float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t"
+      | Bigarray `i32 ->
+        "(int32, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t"
+      | Bigarray `f32 ->
+        "(float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t"
     in
     loop
 
@@ -67,6 +71,8 @@ module Type = struct
       | Tuple3 (t1, t2, t3) -> Printf.sprintf "(%s, %s, %s)" (loop t1) (loop t2) (loop t3)
       | Bigarray `i64 -> "ocaml::bigarray::Array1<i64>"
       | Bigarray `f64 -> "ocaml::bigarray::Array1<f64>"
+      | Bigarray `i32 -> "ocaml::bigarray::Array1<i32>"
+      | Bigarray `f32 -> "ocaml::bigarray::Array1<f32>"
     in
     loop t
 end

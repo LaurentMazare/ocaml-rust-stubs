@@ -1,4 +1,3 @@
-use arrow::array::{Float64Array, Int64Array, StringArray};
 use arrow::record_batch::RecordBatchReader;
 use parquet::arrow::{ArrowReader, ParquetFileArrowReader};
 use parquet::file::reader::{FileReader, SerializedFileReader};
@@ -74,7 +73,7 @@ macro_rules! read_col {
             let mut vec = Vec::with_capacity(num_rows);
             while let Some(batch) = record_batch_reader.next_batch()? {
                 let array_data = batch.column(0);
-                let array_data = match (*array_data).as_any().downcast_ref::<$a>() {
+                let array_data = match (*array_data).as_any().downcast_ref::<arrow::array::$a>() {
                     Some(array_data) => array_data,
                     None => {
                         let msg = format!("cannot downcast {:?} to $a", array_data.data_type());
@@ -102,7 +101,7 @@ macro_rules! read_col {
             let mut offset = 0usize;
             while let Some(batch) = r.next_batch()? {
                 let array_data = batch.column(0);
-                let array_data = match (*array_data).as_any().downcast_ref::<$a>() {
+                let array_data = match (*array_data).as_any().downcast_ref::<arrow::array::$a>() {
                     Some(array_data) => array_data,
                     None => {
                         let msg = format!("cannot downcast {:?} to $a", array_data.data_type());
@@ -118,6 +117,8 @@ macro_rules! read_col {
     };
 }
 
+read_col!(i32, Int32Array, read_i32_col, read_i32_col_ba);
+read_col!(f32, Float32Array, read_f32_col, read_f32_col_ba);
 read_col!(i64, Int64Array, read_i64_col, read_i64_col_ba);
 read_col!(f64, Float64Array, read_f64_col, read_f64_col_ba);
 
@@ -130,7 +131,10 @@ pub fn read_string_col(mut reader: ReaderPtr, idx: isize) -> Result<Vec<String>,
     let mut vec = Vec::with_capacity(num_rows);
     while let Some(batch) = record_batch_reader.next_batch()? {
         let array_data = batch.column(0);
-        let array_data = match (*array_data).as_any().downcast_ref::<StringArray>() {
+        let array_data = match (*array_data)
+            .as_any()
+            .downcast_ref::<arrow::array::StringArray>()
+        {
             Some(array_data) => array_data,
             None => {
                 let msg = format!(

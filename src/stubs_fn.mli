@@ -13,7 +13,7 @@ module Type : sig
   val array : t -> t
   val tuple2 : t -> t -> t
   val tuple3 : t -> t -> t -> t
-  val bigarray : [ `i64 | `f64 ] -> t
+  val bigarray : [ `i64 | `f64 | `i32 | `f32 ] -> t
   val ml_type : t -> string
   val rust_type : t -> str:[ `slice | `string ] -> string
 end
