@@ -17,15 +17,24 @@ let () =
       Stdio.printf "col %d %s %s\n%!" idx name (Parquet_rs.string_of_data_type dt);
       match dt with
       | Int64 ->
-        Parquet_rs.read_i64_col reader idx
-        |> Array.iteri ~f:(fun index v ->
-               Stdio.printf "> %d %d\n%!" index (Int64.to_int_exn v));
         let ba = Parquet_rs.read_i64_col_ba reader idx in
-        for i = 0 to Bigarray.Array1.dim ba - 1 do
-          Stdio.printf ">> %d %d\n%!" i (Int64.to_int_exn ba.{i})
+        for i = 0 to Int.min 40 (Bigarray.Array1.dim ba) - 1 do
+          Stdio.printf "i64> %d %d\n%!" i (Int64.to_int_exn ba.{i})
+        done
+      | Int32 ->
+        let ba = Parquet_rs.read_i32_col_ba reader idx in
+        for i = 0 to Int.min 40 (Bigarray.Array1.dim ba) - 1 do
+          Stdio.printf "i32> %d %d\n%!" i (Int32.to_int_exn ba.{i})
         done
       | Float64 ->
-        Parquet_rs.read_f64_col reader idx
-        |> Array.iteri ~f:(fun index v -> Stdio.printf "> %d %f\n%!" index v)
+        let ba = Parquet_rs.read_f64_col_ba reader idx in
+        for i = 0 to Int.min 40 (Bigarray.Array1.dim ba) - 1 do
+          Stdio.printf "f64> %d %f\n%!" i ba.{i}
+        done
+      | Float32 ->
+        let ba = Parquet_rs.read_f32_col_ba reader idx in
+        for i = 0 to Int.min 40 (Bigarray.Array1.dim ba) - 1 do
+          Stdio.printf "f32> %d %f\n%!" i ba.{i}
+        done
       | _ -> ());
   Parquet_rs.reader_close reader
