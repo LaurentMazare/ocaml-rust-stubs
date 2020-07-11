@@ -3,11 +3,9 @@
  (deps (glob_files *.rs) ../Cargo.toml)
  (action
   (progn
-   (run rm -f %{project_root}/examples/parquet/target/debug/deps/libparquet_ocaml.a)
-   (run rm -f %{project_root}/examples/parquet/target/debug/deps/libparquet_ocaml.so)
    (run cargo +nightly build --target-dir %{project_root}/examples/parquet/target)
-   (run mv %{project_root}/examples/parquet/target/debug/libparquet_ocaml.so ./libparquet_ocaml.so)
-   (run mv %{project_root}/examples/parquet/target/debug/libparquet_ocaml.a libparquet_ocaml.a))))
+   (run cp %{project_root}/examples/parquet/target/debug/libparquet_ocaml.so ./libparquet_ocaml.so)
+   (run cp %{project_root}/examples/parquet/target/debug/libparquet_ocaml.a libparquet_ocaml.a))))
 
 (library
  (name parquet_rs)

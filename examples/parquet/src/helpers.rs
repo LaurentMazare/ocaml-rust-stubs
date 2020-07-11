@@ -67,13 +67,13 @@ macro_rules! read_col {
     ($t:ty, $a:ident, $fn:ident, $fn_ba:ident) => {
         pub fn $fn(mut reader: ReaderPtr, idx: isize) -> Result<Vec<$t>, ocaml::Error> {
             let num_rows = reader.as_ref().num_rows as usize;
-            let mut record_batch_reader = reader
-                .as_mut()
-                .reader
-                .get_record_reader(std::cmp::min(num_rows, 4096))?;
+            let mut record_batch_reader = reader.as_mut().reader.get_record_reader_by_columns(
+                std::iter::once(idx as usize),
+                std::cmp::min(num_rows, 32768),
+            )?;
             let mut vec = Vec::with_capacity(num_rows);
             while let Some(batch) = record_batch_reader.next_batch()? {
-                let array_data = batch.column(idx as usize);
+                let array_data = batch.column(0);
                 let array_data = match (*array_data).as_any().downcast_ref::<$a>() {
                     Some(array_data) => array_data,
                     None => {
@@ -93,15 +93,15 @@ macro_rules! read_col {
             idx: isize,
         ) -> Result<ocaml::bigarray::Array1<$t>, ocaml::Error> {
             let num_rows = r.as_ref().num_rows as usize;
-            let mut r = r
-                .as_mut()
-                .reader
-                .get_record_reader(std::cmp::min(num_rows, 4096))?;
+            let mut r = r.as_mut().reader.get_record_reader_by_columns(
+                std::iter::once(idx as usize),
+                std::cmp::min(num_rows, 32768),
+            )?;
             let mut ba = ocaml::bigarray::Array1::<$t>::create(num_rows);
-            let mut ba_data = ba.data_mut();
+            let ba_data = ba.data_mut();
             let mut offset = 0usize;
             while let Some(batch) = r.next_batch()? {
-                let array_data = batch.column(idx as usize);
+                let array_data = batch.column(0);
                 let array_data = match (*array_data).as_any().downcast_ref::<$a>() {
                     Some(array_data) => array_data,
                     None => {
@@ -123,13 +123,13 @@ read_col!(f64, Float64Array, read_f64_col, read_f64_col_ba);
 
 pub fn read_string_col(mut reader: ReaderPtr, idx: isize) -> Result<Vec<String>, ocaml::Error> {
     let num_rows = reader.as_ref().num_rows as usize;
-    let mut record_batch_reader = reader
-        .as_mut()
-        .reader
-        .get_record_reader(std::cmp::min(num_rows, 512))?;
+    let mut record_batch_reader = reader.as_mut().reader.get_record_reader_by_columns(
+        std::iter::once(idx as usize),
+        std::cmp::min(num_rows, 32768),
+    )?;
     let mut vec = Vec::with_capacity(num_rows);
     while let Some(batch) = record_batch_reader.next_batch()? {
-        let array_data = batch.column(idx as usize);
+        let array_data = batch.column(0);
         let array_data = match (*array_data).as_any().downcast_ref::<StringArray>() {
             Some(array_data) => array_data,
             None => {
