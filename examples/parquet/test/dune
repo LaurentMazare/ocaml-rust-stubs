@@ -1,4 +1,5 @@
 (executables
  (libraries base parquet_rs stdio)
  (names test)
- (modules test))
+ (modules test)
+ (preprocess (pps ppx_fields_conv ppx_sexp_conv)))

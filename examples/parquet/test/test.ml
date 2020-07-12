@@ -1,6 +1,16 @@
 open! Base
 module Sys = Caml.Sys
 
+type t =
+  { x : int
+  ; y : float
+  }
+[@@deriving sexp, fields]
+
+let read =
+  let open Parquet_rs.F in
+  read (Fields.make_creator ~x:i64 ~y:f64)
+
 let print_n a ~kind ~len ~get =
   for i = 0 to Int.min 40 (len a) - 1 do
     Stdio.printf "%s> %d %s\n%!" kind i (get a i)
@@ -40,4 +50,7 @@ let () =
         Parquet_rs.read_f32_col_ba reader idx
         |> print_n_ba ~kind:"f32" ~conv:Float.to_string
       | _ -> ());
-  Parquet_rs.reader_close reader
+  Parquet_rs.reader_close reader;
+  let ts = read Sys.argv.(1) in
+  List.iteri ts ~f:(fun i t ->
+      Stdio.printf "%d %s\n%!" i (sexp_of_t t |> Sexp.to_string_mach))

@@ -47,3 +47,5 @@ let string_of_data_type = function
   | Float64 -> "Float64"
   | Utf8 -> "Utf8"
   | Unknown d -> Printf.sprintf "Unknown<%d>" d
+
+module F = F
