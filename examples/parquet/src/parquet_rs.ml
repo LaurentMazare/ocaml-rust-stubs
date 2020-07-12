@@ -13,6 +13,7 @@ type data_type =
   | Float16
   | Float32
   | Float64
+  | Utf8
   | Unknown of int
 
 let data_type_of_int = function
@@ -28,6 +29,7 @@ let data_type_of_int = function
   | 9 -> Float16
   | 10 -> Float32
   | 11 -> Float64
+  | 12 -> Utf8
   | d -> Unknown d
 
 let string_of_data_type = function
@@ -43,4 +45,5 @@ let string_of_data_type = function
   | Float16 -> "Float16"
   | Float32 -> "Float32"
   | Float64 -> "Float64"
+  | Utf8 -> "Utf8"
   | Unknown d -> Printf.sprintf "Unknown<%d>" d

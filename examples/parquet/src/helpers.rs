@@ -44,6 +44,7 @@ pub fn datatype_to_int(datatype: &arrow::datatypes::DataType) -> isize {
         arrow::datatypes::DataType::Float16 => 9,
         arrow::datatypes::DataType::Float32 => 10,
         arrow::datatypes::DataType::Float64 => 11,
+        arrow::datatypes::DataType::Utf8 => 12,
         _ => -1,
     }
 }
