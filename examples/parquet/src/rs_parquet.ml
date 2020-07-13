@@ -3,7 +3,7 @@
 type reader
 external parquet_reader : string -> reader = "mlparquet__ml_rs1"
 external reader_close : reader -> unit = "mlparquet__ml_rs2"
-external fields : reader -> ((string * int)) array = "mlparquet__ml_rs3"
+external fields : reader -> ((string * int * bool)) array = "mlparquet__ml_rs3"
 external read_i64_col_ba : reader -> int -> (int64, Bigarray.int64_elt, Bigarray.c_layout) Bigarray.Array1.t = "mlparquet__ml_rs4"
 external read_f64_col_ba : reader -> int -> (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t = "mlparquet__ml_rs5"
 external read_i32_col_ba : reader -> int -> (int32, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t = "mlparquet__ml_rs6"

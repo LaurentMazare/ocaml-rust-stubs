@@ -49,13 +49,19 @@ pub fn datatype_to_int(datatype: &arrow::datatypes::DataType) -> isize {
     }
 }
 
-pub fn fields(reader: ReaderPtr) -> Vec<(String, isize)> {
+pub fn fields(reader: ReaderPtr) -> Vec<(String, isize, bool)> {
     reader
         .as_ref()
         .schema
         .fields()
         .into_iter()
-        .map(|x| (x.name().to_owned(), datatype_to_int(x.data_type())))
+        .map(|x| {
+            (
+                x.name().to_owned(),
+                datatype_to_int(x.data_type()),
+                x.is_nullable(),
+            )
+        })
         .collect()
 }
 

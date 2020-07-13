@@ -3,6 +3,7 @@ open! Base
 module Type : sig
   type t
 
+  val bool : t
   val int : t
   val int64 : t
   val float : t

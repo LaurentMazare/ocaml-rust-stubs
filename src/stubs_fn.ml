@@ -2,6 +2,7 @@ open! Base
 
 module Type = struct
   type t =
+    | Bool
     | Int
     | Int64
     | Float
@@ -17,6 +18,7 @@ module Type = struct
     | Tuple3 of t * t * t
     | Bigarray of [ `i64 | `f64 | `i32 | `f32 ]
 
+  let bool = Bool
   let int = Int
   let int64 = Int64
   let float = Float
@@ -31,6 +33,7 @@ module Type = struct
 
   let ml_type =
     let rec loop = function
+      | Bool -> "bool"
       | Int -> "int"
       | Int64 -> "int64"
       | Float -> "float"
@@ -55,6 +58,7 @@ module Type = struct
 
   let rust_type t ~str =
     let rec loop = function
+      | Bool -> "bool"
       | Int -> "isize"
       | Int64 -> "i64"
       | Float -> "f64"
@@ -108,7 +112,7 @@ let arg_count t = List.length t.arg_types
 let abstract_ml_types t =
   let ml_types = Hash_set.create (module String) in
   let rec loop = function
-    | Type.Int | Int64 | Float | Unit | String | Bigarray _ -> ()
+    | Type.Bool | Int | Int64 | Float | Unit | String | Bigarray _ -> ()
     | Abstract_pointer { ml_name; rust_name = _ } -> Hash_set.add ml_types ml_name
     | List t | Array t -> loop t
     | Tuple2 (t1, t2) ->

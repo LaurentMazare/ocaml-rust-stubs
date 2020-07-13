@@ -27,9 +27,9 @@ let () =
         "%d columns, %d rows\n%!"
         (Array.length fields)
         (Reader.num_rows reader);
-      Array.iteri fields ~f:(fun idx (name, dt) ->
-          Stdio.printf "col %d %s %s\n%!" idx name (Data_type.to_string dt);
-          match dt with
+      Array.iteri fields ~f:(fun idx field ->
+          Stdio.printf "col %d %s\n%!" idx (Field.to_string field);
+          match field.data_type with
           | Utf8 ->
             Reader.read_string_col reader idx
             |> print_n ~kind:"str" ~len:Array.length ~get:Array.get

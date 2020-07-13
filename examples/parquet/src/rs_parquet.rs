@@ -16,7 +16,7 @@ pub fn mlparquet__ml_rs2(v1: ocaml::Value) -> ocaml::Value {
 #[ocaml::native_func]
 pub fn mlparquet__ml_rs3(v1: ocaml::Value) -> ocaml::Value {
     let v1: ocaml::Pointer<super::helpers::Reader> =  ocaml::FromValue::from_value(v1);
-    let res: Vec<(String, isize)> = super::helpers::fields(v1);
+    let res: Vec<(String, isize, bool)> = super::helpers::fields(v1);
     res.to_value()
 }
 #[ocaml::native_func]

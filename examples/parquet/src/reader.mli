@@ -2,7 +2,7 @@ type t
 
 val with_file : string -> f:(t -> 'a) -> 'a
 val num_rows : t -> int
-val fields : t -> (string * Data_type.t) array
+val fields : t -> Field_.t array
 val read_string_col : t -> int -> string array
 val read_i64_col : t -> int -> int64 array
 val read_f64_col : t -> int -> float array

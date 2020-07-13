@@ -10,7 +10,8 @@ let num_rows = Rs_parquet.num_rows
 
 let fields t =
   Rs_parquet.fields t
-  |> Array.map ~f:(fun (name, dt_index) -> name, Data_type.of_int dt_index)
+  |> Array.map ~f:(fun (name, dt_index, is_nullable) ->
+         { Field_.name; data_type = Data_type.of_int dt_index; is_nullable })
 
 let read_string_col = Rs_parquet.read_string_col
 let read_i64_col = Rs_parquet.read_i64_col

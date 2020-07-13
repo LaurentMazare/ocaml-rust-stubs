@@ -28,7 +28,7 @@ let fields =
       ~ml_name:"fields"
       ~rust_name:"super::helpers::fields"
       ~arg_types:[ reader ]
-      ~result_type:Type.(array (tuple2 string int))
+      ~result_type:Type.(array (tuple3 string int bool))
       ~can_raise:false)
 
 let num_rows =

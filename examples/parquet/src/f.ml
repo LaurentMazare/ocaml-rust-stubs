@@ -37,7 +37,7 @@ let read creator filename =
   Reader.with_file filename ~f:(fun reader ->
       let fields =
         Reader.fields reader
-        |> Array.mapi ~f:(fun i (name, _dt) -> name, i)
+        |> Array.mapi ~f:(fun i field -> field.Field_.name, i)
         |> Array.to_list
         |> Map.of_alist_exn (module String)
       in
