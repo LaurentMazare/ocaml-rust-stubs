@@ -105,7 +105,11 @@ macro_rules! read_col {
                 let array_data = match (*array_data).as_any().downcast_ref::<arrow::array::$a>() {
                     Some(array_data) => array_data,
                     None => {
-                        let msg = format!("cannot downcast {:?} to $a", array_data.data_type());
+                        let msg = format!(
+                            "cannot downcast {:?} to {}",
+                            array_data.data_type(),
+                            std::stringify!($a)
+                        );
                         return Err(ocaml::Error::Error(msg.into()));
                     }
                 };
