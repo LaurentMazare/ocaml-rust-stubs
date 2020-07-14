@@ -161,3 +161,17 @@ pub fn read_string_col(mut reader: ReaderPtr, idx: isize) -> Result<Vec<String>,
     }
     Ok(vec)
 }
+
+pub fn null_count_for_col(mut reader: ReaderPtr, idx: isize) -> Result<isize, ocaml::Error> {
+    let num_rows = reader.as_ref().num_rows as usize;
+    let mut record_batch_reader = reader.as_mut().reader.get_record_reader_by_columns(
+        std::iter::once(idx as usize),
+        std::cmp::min(num_rows, 32768),
+    )?;
+    let mut null_count = 0usize;
+    while let Some(batch) = record_batch_reader.next_batch()? {
+        let array_data = batch.column(0);
+        null_count += array_data.null_count();
+    }
+    Ok(null_count as isize)
+}

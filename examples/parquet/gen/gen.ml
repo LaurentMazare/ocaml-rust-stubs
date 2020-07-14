@@ -76,6 +76,15 @@ let read_string_col =
       ~result_type:Type.(array string)
       ~can_raise:true)
 
+let null_count_for_col =
+  Stubs_fn.(
+    create
+      ~ml_name:"null_count_for_col"
+      ~rust_name:"super::helpers::null_count_for_col"
+      ~arg_types:[ reader; Type.int ]
+      ~result_type:Type.int
+      ~can_raise:true)
+
 let stubs =
   { Stubs_gen.fns =
       [ parquet_reader
@@ -89,6 +98,7 @@ let stubs =
       ; read_f64_col
       ; read_string_col
       ; num_rows
+      ; null_count_for_col
       ]
   ; prefix = "mlparquet_"
   }

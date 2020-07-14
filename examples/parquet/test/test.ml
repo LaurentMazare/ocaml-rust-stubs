@@ -28,7 +28,8 @@ let () =
         (Array.length fields)
         (Reader.num_rows reader);
       Array.iteri fields ~f:(fun idx field ->
-          Stdio.printf "col %d %s\n%!" idx (Field.to_string field);
+          let null_count = Reader.null_count_for_col reader idx in
+          Stdio.printf "col %d %s  null: %d\n%!" idx (Field.to_string field) null_count;
           match field.data_type with
           | Utf8 ->
             Reader.read_string_col reader idx

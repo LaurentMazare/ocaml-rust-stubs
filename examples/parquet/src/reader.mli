@@ -26,3 +26,5 @@ val read_f64_col_ba
   :  t
   -> int
   -> (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t
+
+val null_count_for_col : t -> int -> int

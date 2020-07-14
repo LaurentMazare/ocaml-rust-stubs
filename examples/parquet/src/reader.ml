@@ -20,3 +20,4 @@ let read_i32_col_ba = Rs_parquet.read_i32_col_ba
 let read_f32_col_ba = Rs_parquet.read_f32_col_ba
 let read_i64_col_ba = Rs_parquet.read_i64_col_ba
 let read_f64_col_ba = Rs_parquet.read_f64_col_ba
+let null_count_for_col = Rs_parquet.null_count_for_col
