@@ -175,3 +175,24 @@ pub fn null_count_for_col(mut reader: ReaderPtr, idx: isize) -> Result<isize, oc
     }
     Ok(null_count as isize)
 }
+
+/*
+pub fn read_null_buffer_col(mut reader: ReaderPtr, idx: isize) -> Result<isize, ocaml::Error> {
+    let num_rows = reader.as_ref().num_rows as usize;
+    let mut record_batch_reader = reader.as_mut().reader.get_record_reader_by_columns(
+        std::iter::once(idx as usize),
+        std::cmp::min(num_rows, 32768),
+    )?;
+    let mut null_buffers = vec![];
+    let mut buffer_len = 0usize;
+    while let Some(batch) = record_batch_reader.next_batch()? {
+        let array_data = batch.column(0);
+        let null_buffer = match array_data.data().null_buffer() {
+            Some(v) => v,
+            None => return Err(ocaml::Error::Error("not nullable".into())),
+        };
+        null_buffers.push(null_buffer);
+    }
+    Ok(null_buffers)
+}
+*/

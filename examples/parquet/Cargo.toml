@@ -10,6 +10,6 @@ crate-type = ["staticlib", "cdylib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-arrow = "0.16.0"
-parquet = "0.16.0"
+arrow = "1.0.0"
+parquet = "1.0.0"
 ocaml = { git = "https://github.com/zshipko/ocaml-rs.git" }
