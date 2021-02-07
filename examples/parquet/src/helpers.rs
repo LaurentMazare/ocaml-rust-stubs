@@ -1,8 +1,7 @@
-use arrow::record_batch::RecordBatchReader;
 use parquet::arrow::{ArrowReader, ParquetFileArrowReader};
 use parquet::file::reader::{FileReader, SerializedFileReader};
 use std::fs::File;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct Reader {
     reader: parquet::arrow::ParquetFileArrowReader,
@@ -16,7 +15,7 @@ pub fn parquet_reader(filename: &'static str) -> Result<ReaderPtr, ocaml::Error>
     let file = File::open(filename)?;
     let reader = SerializedFileReader::new(file)?;
     let num_rows = reader.metadata().file_metadata().num_rows();
-    let mut reader = ParquetFileArrowReader::new(Rc::new(reader));
+    let mut reader = ParquetFileArrowReader::new(Arc::new(reader));
     let schema = reader.get_schema()?;
     Ok(ocaml::Pointer::alloc_custom(Reader {
         reader,
@@ -73,12 +72,13 @@ macro_rules! read_col {
     ($t:ty, $a:ident, $fn:ident, $fn_ba:ident) => {
         pub fn $fn(mut reader: ReaderPtr, idx: isize) -> Result<Vec<$t>, ocaml::Error> {
             let num_rows = reader.as_ref().num_rows as usize;
-            let mut record_batch_reader = reader.as_mut().reader.get_record_reader_by_columns(
+            let record_batch_reader = reader.as_mut().reader.get_record_reader_by_columns(
                 std::iter::once(idx as usize),
                 std::cmp::min(num_rows, 32768),
             )?;
             let mut vec = Vec::with_capacity(num_rows);
-            while let Some(batch) = record_batch_reader.next_batch()? {
+            for batch in record_batch_reader {
+                let batch = batch?;
                 let array_data = batch.column(0);
                 let array_data = match (*array_data).as_any().downcast_ref::<arrow::array::$a>() {
                     Some(array_data) => array_data,
@@ -99,14 +99,15 @@ macro_rules! read_col {
             idx: isize,
         ) -> Result<ocaml::bigarray::Array1<$t>, ocaml::Error> {
             let num_rows = r.as_ref().num_rows as usize;
-            let mut r = r.as_mut().reader.get_record_reader_by_columns(
+            let r = r.as_mut().reader.get_record_reader_by_columns(
                 std::iter::once(idx as usize),
                 std::cmp::min(num_rows, 32768),
             )?;
             let mut ba = ocaml::bigarray::Array1::<$t>::create(num_rows);
             let ba_data = ba.data_mut();
             let mut offset = 0usize;
-            while let Some(batch) = r.next_batch()? {
+            for batch in r {
+                let batch = batch?;
                 let array_data = batch.column(0);
                 let array_data = match (*array_data).as_any().downcast_ref::<arrow::array::$a>() {
                     Some(array_data) => array_data,
@@ -120,7 +121,7 @@ macro_rules! read_col {
                     }
                 };
                 let len = array_data.len();
-                ba_data[offset..offset + len].copy_from_slice(array_data.value_slice(0, len));
+                ba_data[offset..offset + len].copy_from_slice(array_data.values());
                 offset += len;
             }
             Ok(ba)
@@ -135,12 +136,13 @@ read_col!(f64, Float64Array, read_f64_col, read_f64_col_ba);
 
 pub fn read_string_col(mut reader: ReaderPtr, idx: isize) -> Result<Vec<String>, ocaml::Error> {
     let num_rows = reader.as_ref().num_rows as usize;
-    let mut record_batch_reader = reader.as_mut().reader.get_record_reader_by_columns(
+    let record_batch_reader = reader.as_mut().reader.get_record_reader_by_columns(
         std::iter::once(idx as usize),
         std::cmp::min(num_rows, 32768),
     )?;
     let mut vec = Vec::with_capacity(num_rows);
-    while let Some(batch) = record_batch_reader.next_batch()? {
+    for batch in record_batch_reader {
+        let batch = batch?;
         let array_data = batch.column(0);
         let array_data = match (*array_data)
             .as_any()
@@ -164,12 +166,13 @@ pub fn read_string_col(mut reader: ReaderPtr, idx: isize) -> Result<Vec<String>,
 
 pub fn null_count_for_col(mut reader: ReaderPtr, idx: isize) -> Result<isize, ocaml::Error> {
     let num_rows = reader.as_ref().num_rows as usize;
-    let mut record_batch_reader = reader.as_mut().reader.get_record_reader_by_columns(
+    let record_batch_reader = reader.as_mut().reader.get_record_reader_by_columns(
         std::iter::once(idx as usize),
         std::cmp::min(num_rows, 32768),
     )?;
     let mut null_count = 0usize;
-    while let Some(batch) = record_batch_reader.next_batch()? {
+    for batch in record_batch_reader {
+        let batch = batch?;
         let array_data = batch.column(0);
         null_count += array_data.null_count();
     }
@@ -185,7 +188,7 @@ pub fn read_null_buffer_col(mut reader: ReaderPtr, idx: isize) -> Result<isize, 
     )?;
     let mut null_buffers = vec![];
     let mut buffer_len = 0usize;
-    while let Some(batch) = record_batch_reader.next_batch()? {
+    while let Some(batch) = record_batch_reader.next()? {
         let array_data = batch.column(0);
         let null_buffer = match array_data.data().null_buffer() {
             Some(v) => v,
