@@ -3,7 +3,7 @@
  (deps (glob_files *.rs) ../Cargo.toml)
  (action
   (progn
-   (run cargo +nightly build --target-dir %{project_root}/examples/parquet/target)
+   (run cargo +nightly build --release --target-dir %{project_root}/examples/parquet/target)
    (run cp %{project_root}/examples/parquet/target/debug/libparquet_ocaml.so ./libparquet_ocaml.so)
    (run cp %{project_root}/examples/parquet/target/debug/libparquet_ocaml.a libparquet_ocaml.a))))
 

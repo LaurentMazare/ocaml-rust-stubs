@@ -11,6 +11,7 @@ let parquet_reader =
       ~rust_name:"super::helpers::parquet_reader"
       ~arg_types:[ Type.string ]
       ~result_type:reader
+      ~with_runtime:true
       ~can_raise:true)
 
 let reader_close =
@@ -20,6 +21,7 @@ let reader_close =
       ~rust_name:"super::helpers::reader_close"
       ~arg_types:[ reader ]
       ~result_type:Type.unit
+      ~with_runtime:false
       ~can_raise:false)
 
 let fields =
@@ -29,6 +31,7 @@ let fields =
       ~rust_name:"super::helpers::fields"
       ~arg_types:[ reader ]
       ~result_type:Type.(array (tuple3 string int bool))
+      ~with_runtime:false
       ~can_raise:false)
 
 let num_rows =
@@ -38,6 +41,7 @@ let num_rows =
       ~rust_name:"super::helpers::num_rows"
       ~arg_types:[ reader ]
       ~result_type:Type.int
+      ~with_runtime:false
       ~can_raise:false)
 
 let read_i64_col =
@@ -47,6 +51,7 @@ let read_i64_col =
       ~rust_name:"super::helpers::read_i64_col"
       ~arg_types:[ reader; Type.int ]
       ~result_type:Type.(array int64)
+      ~with_runtime:false
       ~can_raise:true)
 
 let ba_col str kind =
@@ -56,6 +61,7 @@ let ba_col str kind =
       ~rust_name:(Printf.sprintf "super::helpers::read_%s_col_ba" str)
       ~arg_types:[ reader; Type.int ]
       ~result_type:Type.(bigarray kind)
+      ~with_runtime:true
       ~can_raise:true)
 
 let read_f64_col =
@@ -65,6 +71,7 @@ let read_f64_col =
       ~rust_name:"super::helpers::read_f64_col"
       ~arg_types:[ reader; Type.int ]
       ~result_type:Type.(array float)
+      ~with_runtime:false
       ~can_raise:true)
 
 let read_string_col =
@@ -74,6 +81,7 @@ let read_string_col =
       ~rust_name:"super::helpers::read_string_col"
       ~arg_types:[ reader; Type.int ]
       ~result_type:Type.(array string)
+      ~with_runtime:false
       ~can_raise:true)
 
 let null_count_for_col =
@@ -83,6 +91,7 @@ let null_count_for_col =
       ~rust_name:"super::helpers::null_count_for_col"
       ~arg_types:[ reader; Type.int ]
       ~result_type:Type.int
+      ~with_runtime:false
       ~can_raise:true)
 
 let stubs =

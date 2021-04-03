@@ -11,17 +11,23 @@ pub struct Reader {
 ocaml::custom!(Reader);
 type ReaderPtr = ocaml::Pointer<Reader>;
 
-pub fn parquet_reader(filename: &'static str) -> Result<ReaderPtr, ocaml::Error> {
+pub fn parquet_reader(
+    rt: &ocaml::Runtime,
+    filename: &'static str,
+) -> Result<ReaderPtr, ocaml::Error> {
     let file = File::open(filename)?;
     let reader = SerializedFileReader::new(file)?;
     let num_rows = reader.metadata().file_metadata().num_rows();
     let mut reader = ParquetFileArrowReader::new(Arc::new(reader));
     let schema = reader.get_schema()?;
-    Ok(ocaml::Pointer::alloc_custom(Reader {
-        reader,
-        schema,
-        num_rows,
-    }))
+    Ok(ocaml::Pointer::alloc_custom(
+        rt,
+        Reader {
+            reader,
+            schema,
+            num_rows,
+        },
+    ))
 }
 
 pub fn reader_close(reader: ReaderPtr) {
@@ -95,6 +101,7 @@ macro_rules! read_col {
         }
 
         pub fn $fn_ba(
+            rt: &ocaml::Runtime,
             mut r: ReaderPtr,
             idx: isize,
         ) -> Result<ocaml::bigarray::Array1<$t>, ocaml::Error> {
@@ -103,7 +110,7 @@ macro_rules! read_col {
                 std::iter::once(idx as usize),
                 std::cmp::min(num_rows, 32768),
             )?;
-            let mut ba = ocaml::bigarray::Array1::<$t>::create(num_rows);
+            let mut ba = ocaml::bigarray::Array1::<$t>::create(rt, num_rows);
             let ba_data = ba.data_mut();
             let mut offset = 0usize;
             for batch in r {

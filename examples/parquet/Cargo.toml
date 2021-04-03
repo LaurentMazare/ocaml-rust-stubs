@@ -12,4 +12,4 @@ crate-type = ["staticlib", "cdylib"]
 [dependencies]
 arrow = "3.0.0"
 parquet = "3.0.0"
-ocaml = { git = "https://github.com/zshipko/ocaml-rs.git" }
+ocaml = "0.20.1"

@@ -27,6 +27,7 @@ val create
   -> arg_types:Type.t list
   -> result_type:Type.t
   -> can_raise:bool
+  -> with_runtime:bool
   -> t
 
 val ml_name : t -> string
@@ -37,3 +38,4 @@ val arg_types : t -> Type.t list
 val result_type : t -> Type.t
 val rust_result_type : t -> string
 val abstract_ml_types : t -> string list
+val with_runtime : t -> bool

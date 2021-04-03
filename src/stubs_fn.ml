@@ -88,15 +88,17 @@ type t =
   ; arg_types : Type.t list
   ; result_type : Type.t
   ; can_raise : bool
+  ; with_runtime : bool
   }
 
-let create ~ml_name ~rust_name ~arg_types ~result_type ~can_raise =
-  { ml_name; rust_name; arg_types; result_type; can_raise }
+let create ~ml_name ~rust_name ~arg_types ~result_type ~can_raise ~with_runtime =
+  { ml_name; rust_name; arg_types; result_type; can_raise; with_runtime }
 
 let ml_name t = t.ml_name
 let rust_name t = t.rust_name
 let arg_types t = t.arg_types
 let result_type t = t.result_type
+let with_runtime t = t.with_runtime
 
 let rust_result_type t =
   let result_type = Type.rust_type t.result_type ~str:`string in
